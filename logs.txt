@@ -1,0 +1,206 @@
+//Backend starting Logs
+dheerajsingh@localhost:~/Desktop/TaskHub$ cd server
+dheerajsingh@localhost:~/Desktop/TaskHub/server$ npm run dev
+
+> auth-dashboard-server@1.0.0 dev
+> nodemon src/index.js
+
+[nodemon] 3.1.11
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,cjs,json
+[nodemon] starting `node src/index.js`
+Server running on port 5000
+MongoDB connected: ac-wdq3vcg-shard-00-00.kl7nrio.mongodb.net
+
+
+
+// Health-Cheack 
+api-http://localhost:5000/api/health
+logs-
+GET /api/health 200 1.336 ms - 31
+
+//register route
+api-http://localhost:5000/api/v1/auth/register
+
+
+{
+  success: true,
+  data: {
+    user: {
+      id: new ObjectId('698b16419b8c2c53c2e829e1'),
+      name: 'Dheeraj',
+      email: 'dheeraj@gmail.com'
+    },
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIxNjQxOWI4YzJjNTNjMmU4MjllMSIsImlhdCI6MTc3MDcyMjg4MSwiZXhwIjoxNzcxMzI3NjgxfQ.BpmthudPBiRq06iifa6VmCbh1-7p2vTT52BpOziomp8'
+  }
+}
+POST /api/v1/auth/register 201 352.853 ms - 293
+
+// Login
+
+api-http://localhost:5000/api/v1/auth/login 
+
+{
+  success: true,
+  data: {
+    user: {
+      id: new ObjectId('698b16419b8c2c53c2e829e1'),
+      name: 'Dheeraj',
+      email: 'dheeraj@gmail.com'
+    },
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIxNjQxOWI4YzJjNTNjMmU4MjllMSIsImlhdCI6MTc3MDcyMzA4NSwiZXhwIjoxNzcxMzI3ODg1fQ.cIcC7g0MytNzlqVgPb_sxqaLEaxMih2TuH0kqzEFXho'
+  }
+}
+POST /api/v1/auth/login 200 300.370 ms - 293
+
+//profile
+
+api:-http://localhost:5000/api/v1/auth/profile
+
+{
+  success: true,
+  profile: {
+    id: new ObjectId('698b16419b8c2c53c2e829e1'),
+    name: 'Dheeraj',
+    email: 'dheeraj@gmail.com',
+    createdAt: 2026-02-10T11:28:01.365Z
+  }
+}
+GET /api/v1/auth/profile 200 158.966 ms - 141
+
+// Update profile
+ 
+api:- PUT(http://localhost:5000/api/v1/auth/profile)
+
+
+{
+  success: true,
+  data: {
+    id: new ObjectId('698b16419b8c2c53c2e829e1'),
+    name: 'Dheeraj Kumar',
+    email: 'dheeraj@gmail.com'
+  }
+}
+PUT /api/v1/auth/profile 200 149.714 ms - 108
+
+
+//Logout
+
+
+Logout route hit
+{ success: true, message: 'Logged out successfully' }
+POST /api/v1/auth/logout 200 59.556 ms - 52
+
+
+////////////////////////--Task--/////////////////////////
+
+
+// Create task
+api:-http://localhost:5000/api/v1/tasks
+
+Task created: {
+  success: true,
+  data: {
+    title: 'Go to Gym',
+    description: 'Back and Shoulder',
+    status: 'pending',
+    priority: 'medium',
+    user: new ObjectId('698b16419b8c2c53c2e829e1'),
+    _id: new ObjectId('698b19eb28c0b839ef630d89'),
+    createdAt: 2026-02-10T11:43:39.480Z,
+    updatedAt: 2026-02-10T11:43:39.480Z,
+    __v: 0
+  }
+}
+POST /api/v1/tasks 201 164.800 ms - 271
+
+
+// Get Task
+api:- http://localhost:5000/api/v1/tasks
+
+
+{
+  success: true,
+  data: [
+    {
+      _id: new ObjectId('698b19eb28c0b839ef630d89'),
+      title: 'Go to Gym',
+      description: 'Back and Shoulder',
+      status: 'pending',
+      priority: 'medium',
+      user: new ObjectId('698b16419b8c2c53c2e829e1'),
+      createdAt: 2026-02-10T11:43:39.480Z,
+      updatedAt: 2026-02-10T11:43:39.480Z,
+      __v: 0
+    },
+    {
+      _id: new ObjectId('698b19a97719ce9751262441'),
+      title: 'Go to Gym',
+      description: 'Back and Shoulder',
+      status: 'pending',
+      priority: 'medium',
+      user: new ObjectId('698b16419b8c2c53c2e829e1'),
+      createdAt: 2026-02-10T11:42:33.809Z,
+      updatedAt: 2026-02-10T11:42:33.809Z,
+      __v: 0
+    }
+  ]
+}
+GET /api/v1/tasks 200 221.660 ms - 575
+
+
+// Search The Task By Query
+api:- http://localhost:5000/api/v1/tasks/search?query=gym
+
+
+{
+  success: true,
+  data: [
+    {
+      _id: new ObjectId('698b19eb28c0b839ef630d89'),
+      title: 'Go to Gym',
+      description: 'Back and Shoulder',
+      status: 'pending',
+      priority: 'medium',
+      user: new ObjectId('698b16419b8c2c53c2e829e1'),
+      createdAt: 2026-02-10T11:43:39.480Z,
+      updatedAt: 2026-02-10T11:43:39.480Z,
+      __v: 0
+    },
+    {
+      _id: new ObjectId('698b19a97719ce9751262441'),
+      title: 'Go to Gym',
+      description: 'Back and Shoulder',
+      status: 'pending',
+      priority: 'medium',
+      user: new ObjectId('698b16419b8c2c53c2e829e1'),
+      createdAt: 2026-02-10T11:42:33.809Z,
+      updatedAt: 2026-02-10T11:42:33.809Z,
+      __v: 0
+    }
+  ]
+}
+GET /api/v1/tasks/search?query=gym 200 127.010 ms - 521
+
+// Update the Task
+
+api:-PUT http://localhost:5000/api/v1/tasks/698b19eb28c0b839ef630d89
+
+
+{
+  success: true,
+  data: {
+    _id: new ObjectId('698b19eb28c0b839ef630d89'),
+    title: 'Go to Gym',
+    description: 'Back and Shoulder',
+    status: 'completed',
+    priority: 'medium',
+    user: new ObjectId('698b16419b8c2c53c2e829e1'),
+    createdAt: 2026-02-10T11:43:39.480Z,
+    updatedAt: 2026-02-10T11:57:49.282Z,
+    __v: 0
+  }
+}
+PUT /api/v1/tasks/698b19eb28c0b839ef630d89 200 445.209 ms - 273
+
