@@ -1,22 +1,12 @@
 import taskService from "../services/taskService.js";
+import logger from "../utils/logger.js";
 
 const createTask = async (req, res, next) => {
   try {
-    const { title } = req.body;
-
-    if (!title || !title.trim()) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Task title is required" });
-    }
-
     const task = await taskService.create(req.user._id, req.body);
 
     res.status(201).json({ success: true, data: task });
-    console.log("Task created:", {
-      success: true,
-      data: task,
-    });
+    logger.info("Task created", { taskId: task._id, userId: req.user._id });
   } catch (error) {
     next(error);
   }
@@ -32,7 +22,15 @@ const getTasks = async (req, res, next) => {
       limit,
     });
     res.status(200).json({ success: true, data: result });
-    console.log({ success: true, data: result.tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getTaskStats = async (req, res, next) => {
+  try {
+    const stats = await taskService.getStats(req.user._id);
+    res.status(200).json({ success: true, data: stats });
   } catch (error) {
     next(error);
   }
@@ -40,20 +38,12 @@ const getTasks = async (req, res, next) => {
 
 const updateTask = async (req, res, next) => {
   try {
-    const { title } = req.body;
-
-    if (!title || !title.trim()) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Task title is required" });
-    }
-
     const task = await taskService.update(
       req.params.id,
       req.user._id,
       req.body,
     );
-    console.log({ success: true, data: task });
+    logger.info("Task updated", { taskId: req.params.id });
     res.status(200).json({ success: true, data: task });
   } catch (error) {
     next(error);
@@ -63,6 +53,7 @@ const updateTask = async (req, res, next) => {
 const deleteTask = async (req, res, next) => {
   try {
     await taskService.delete(req.params.id, req.user._id);
+    logger.info("Task deleted", { taskId: req.params.id });
     res
       .status(200)
       .json({ success: true, message: "Task deleted successfully" });
@@ -76,10 +67,16 @@ const searchTasks = async (req, res, next) => {
     const { query } = req.query;
     const tasks = await taskService.search(req.user._id, query);
     res.status(200).json({ success: true, data: tasks });
-    console.log({ success: true, data: tasks });
   } catch (error) {
     next(error);
   }
 };
 
-export { createTask, getTasks, updateTask, deleteTask, searchTasks };
+export {
+  createTask,
+  getTasks,
+  getTaskStats,
+  updateTask,
+  deleteTask,
+  searchTasks,
+};

@@ -37,6 +37,15 @@ const Dashboard = () => {
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await taskAPI.getStats();
+      setStats(res.data.data);
+    } catch (error) {
+      // Stats will stay at defaults
+    }
+  }, []);
+
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
@@ -64,17 +73,12 @@ const Dashboard = () => {
   }, [fetchTasks]);
 
   useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, statusFilter, priorityFilter]);
+    fetchStats();
+  }, [fetchStats]);
 
   useEffect(() => {
-    setStats({
-      total: tasks.length,
-      pending: tasks.filter((t) => t.status === "pending").length,
-      inProgress: tasks.filter((t) => t.status === "in-progress").length,
-      completed: tasks.filter((t) => t.status === "completed").length,
-    });
-  }, [tasks]);
+    setPage(1);
+  }, [debouncedSearch, statusFilter, priorityFilter]);
 
   const handleSave = async (data, taskId) => {
     if (taskId) {
@@ -83,6 +87,7 @@ const Dashboard = () => {
       await taskAPI.create(data);
     }
     fetchTasks();
+    fetchStats();
   };
 
   const handleDelete = async (taskId) => {
@@ -91,6 +96,7 @@ const Dashboard = () => {
       await taskAPI.delete(taskId);
       toast.success("Task deleted");
       fetchTasks();
+      fetchStats();
     } catch (error) {
       toast.error("Failed to delete task");
     }

@@ -42,6 +42,7 @@ export const taskAPI = {
   update: (id, data) => api.put(`/tasks/${id}`, data),
   delete: (id) => api.delete(`/tasks/${id}`),
   search: (query) => api.get("/tasks/search", { params: { query } }),
+  getStats: () => api.get("/tasks/stats"),
 };
 
 export default api;

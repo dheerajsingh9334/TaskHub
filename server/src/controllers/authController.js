@@ -1,34 +1,29 @@
 import authService from "../services/authService.js";
+import logger from "../utils/logger.js";
+import { encryptFields } from "../utils/encryption.js";
+import env from "../config/env.js";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+  secure: env.isProd,
+  sameSite: env.isProd ? "strict" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: "/",
 };
 
 const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password are required",
-      });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters",
-      });
-    }
-
     const result = await authService.register(req.body);
 
+    // Encrypt sensitive fields in response
+    const encryptedUser = encryptFields(result.user, ["email"]);
+
     res.cookie("token", result.token, COOKIE_OPTIONS);
-    res.status(201).json({ success: true, data: result });
-    console.log({ success: true, data: result });
+    res.status(201).json({
+      success: true,
+      data: { user: encryptedUser, token: result.token },
+    });
+    logger.info("User registered", { userId: result.user.id });
   } catch (error) {
     next(error);
   }
@@ -36,19 +31,17 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email and password are required" });
-    }
-
     const result = await authService.login(req.body);
 
+    // Encrypt sensitive fields in response
+    const encryptedUser = encryptFields(result.user, ["email"]);
+
     res.cookie("token", result.token, COOKIE_OPTIONS);
-    res.status(200).json({ success: true, data: result });
-    console.log({ success: true, data: result });
+    res.status(200).json({
+      success: true,
+      data: { user: encryptedUser, token: result.token },
+    });
+    logger.info("User logged in", { userId: result.user.id });
   } catch (error) {
     next(error);
   }
@@ -57,7 +50,6 @@ const login = async (req, res, next) => {
 const getProfile = async (req, res, next) => {
   try {
     const profile = await authService.getProfile(req.user._id);
-    console.log({ success: true, profile });
     res.status(200).json({ success: true, data: profile });
   } catch (error) {
     next(error);
@@ -77,22 +69,24 @@ const updateProfile = async (req, res, next) => {
     const profile = await authService.updateProfile(req.user._id, req.body);
 
     res.status(200).json({ success: true, data: profile });
-    console.log({ success: true, data: profile });
+    logger.info("Profile updated", { userId: req.user._id });
   } catch (error) {
     next(error);
   }
 };
 
 const logout = async (req, res, next) => {
-  console.log("Logout route hit");
   try {
     res.cookie("token", "", {
       httpOnly: true,
+      secure: env.isProd,
+      sameSite: env.isProd ? "strict" : "lax",
       expires: new Date(0),
+      path: "/",
     });
 
     res.status(200).json({ success: true, message: "Logged out successfully" });
-    console.log({ success: true, message: "Logged out successfully" });
+    logger.info("User logged out");
   } catch (error) {
     next(error);
   }

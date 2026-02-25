@@ -64,6 +64,17 @@ class TaskService {
 
     return tasks;
   }
+
+  async getStats(userId) {
+    const [total, pending, inProgress, completed] = await Promise.all([
+      Task.countDocuments({ user: userId }),
+      Task.countDocuments({ user: userId, status: "pending" }),
+      Task.countDocuments({ user: userId, status: "in-progress" }),
+      Task.countDocuments({ user: userId, status: "completed" }),
+    ]);
+
+    return { total, pending, inProgress, completed };
+  }
 }
 
 export default new TaskService();
